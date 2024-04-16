@@ -1,0 +1,247 @@
+#include <iostream>
+#include <fstream>
+
+struct Contact
+{
+
+	std::string fName, iName;
+	std::string number;
+	std::string day, month, year;
+	std::string adress;
+	std::string note;
+
+
+	void output()
+	{
+		std::cout << fName << " ";
+		std::cout << iName << " ";
+		std::cout << number << " ";
+		std::cout << day << " ";
+		std::cout << month << " ";
+		std::cout << year << " ";
+		std::cout << adress << " ";
+	}
+
+};
+
+struct Table
+{
+	const int N = 200;
+	Contact* contacts = new Contact[N];
+	int n = 0;
+	
+
+
+	void input()
+	{
+
+		std::ifstream file;
+		file.open("contacts.txt");
+
+		while (!file.eof())
+		{
+			add(file);
+		}
+	}
+
+
+
+	void add()
+	{
+
+		std::string fName, iName;
+		std::string number;
+		std::string day, month, year;
+		std::string adress;
+
+		std::cin >> fName >> iName;
+		std::cin >> number;
+		std::cin >> day >> month >> year;
+		std::cin >> adress;
+
+		add(Contact{ fName, iName, number, day, month, year, adress });
+
+	}
+
+	void add(std::ifstream& file)
+	{
+
+		std::string fName, iName;
+		std::string number;
+		std::string day, month, year;
+		std::string adress;
+
+		file >> fName >> iName;
+		file >> number;
+		file >> day >> month >> year;
+		file >> adress;
+
+		add(Contact{ fName, iName, number, day, month, year, adress });
+	}
+
+	void add(Contact contact)
+	{
+		int findIndex = -1;
+		for (int i = 0; i < n; i++)
+		{
+			if (contact.fName[0] == contacts[i].fName[0])
+			{
+				findIndex = i;
+				break;
+			}
+		}
+
+		if (findIndex == -1)
+		{
+			contacts[n++] = Contact{ contact };
+		}
+
+		else
+		{
+			for (int i = n++; i > findIndex; i--)
+			{
+				std::swap(contacts[i], contacts[i - 1]);
+			}
+			contacts[findIndex] = Contact{ contact };
+		}
+	}
+
+	void deleteByIndex(int index)
+	{
+		for (int i = index; i < n - 1; i++)
+		{
+			std::swap(contacts[i], contacts[i + 1]);
+		}
+		n--;
+	}
+
+	void deleteByNumber(std::string number)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			if (contacts[i].number == number)
+			{
+				deleteByIndex(i);
+			}
+		}
+	}
+
+	// out: data number
+	// in: fName
+
+	void printDataNumberByFName(std::string fName)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			if (contacts[i].fName == fName)
+			{
+				std::cout << contacts[i].day << '.';
+				std::cout << contacts[i].month << '.';
+				std::cout << contacts[i].year << ' ';
+				std::cout << contacts[i].number << "\n";
+			}
+		}
+	}
+
+	void output()
+	{
+		for (int i = 0; i < n; i++)
+		{
+			contacts[i].output();
+			std::cout << "\n";
+		}
+	}
+};
+
+Table genTableMonth(Table& table, std::string month)
+{
+	Table newTable;
+	for (int i = 0; i < table.n; i++)
+	{
+		if (table.contacts[i].month == month)
+		{
+			newTable.contacts[newTable.n++] = Contact{ table.contacts[i] };
+		}
+	}
+	return newTable;
+}
+
+int main()
+{
+
+
+	std::string number, month, fName, select, note;
+
+
+
+a1: std::cout << "Notebook:\n";
+	Table t;
+	t.input();
+	t.output();
+
+	std::cout << "\n";
+	std::cout << "Select an action:\n";
+	std::cout << "0 - Exit the program.\n";
+	std::cout << "1 - Add new note.\n";
+	std::cout << "2 - Delete note by number.\n";
+	std::cout << "3 - Make list by month.\n";
+	std::cout << "4 - Find the date of birth and phone number by last name.\n";
+	std::cin >> select;
+
+
+	while (select != "0")
+	{
+		if (select == "1")
+		{
+			std::cout << "Input note\n";
+			t.add();
+			std::cout << "\n";
+			t.output();
+			std::cout << "\n";
+			goto a1;
+		}
+
+		else if (select == "2")
+		{
+			std::cout << "Input number\n";
+			std::cin >> number;
+			std::cout << "\n";
+			t.deleteByNumber(number);
+			t.output();
+			std::cout << "\n";
+			goto a1;
+		}
+
+		else if (select == "3")
+		{
+			std::cout << "Enter the month by which to print:\n";
+			std::cin >> month;
+			Table newT = genTableMonth(t, month);
+			std::cout << "\n";
+			newT.output();
+			std::cout << "\n";
+			goto a1;
+		}
+
+		else if (select == "4")
+		{
+			std::cout << "\n";
+			std::cout << "Enter the last name by which to display the date of birth and number:\n";
+			std::cin >> fName;
+			std::cout << "\n";
+			t.printDataNumberByFName(fName);
+			std::cout << "\n";
+			goto a1;
+		}
+		std::cout << "\n";
+		goto a1;
+	}
+
+	if (select == "0") {
+		std::cout << "\n";
+		return 0;
+	}
+
+	return 0;
+
+}
