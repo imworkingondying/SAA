@@ -1,0 +1,191 @@
+#include <iostream>
+
+using namespace std;
+
+// Определение узла списка
+struct Node {
+    char val;
+    Node* next;
+    Node(char x) : val(x), next(NULL) {}
+};
+
+// Функция для поиска самой длинной последовательности одинаковых символов
+void longest_sequence(Node* head) {
+    if (!head) return;
+
+    int max_len = 1;
+    char max_char = head->val;
+
+    int len = 1;
+    char cur_char = head->val;
+
+    Node* cur = head->next;
+
+    while (cur) {
+        if (cur->val == cur_char) {
+            len++;
+        }
+        else {
+            if (len > max_len) {
+                max_len = len;
+                max_char = cur_char;
+            }
+            len = 1;
+            cur_char = cur->val;
+        }
+        cur = cur->next;
+    }
+
+    if (len > max_len) {
+        max_len = len;
+        max_char = cur_char;
+    }
+
+    cout << "The longest sequence of identical characters is: ";
+    for (int i = 0; i < max_len; i++) {
+        cout << max_char;
+    }
+    cout << endl;
+}
+
+// Функция для удаления повторяющихся символов в последовательности
+void removeDuplicates(Node* head) {
+    Node* current = head;
+    Node* outer = NULL;
+
+    // перебираем все узлы списка
+    while (current != NULL) {
+        outer = current;
+
+        // перебираем все последующие узлы списка
+        while (outer->next != NULL) {
+            // если символы совпадают, удаляем последующий узел
+            if (outer->next->val == current->val) {
+                Node* duplicate = outer->next;
+                outer->next = outer->next->next;
+                delete duplicate;
+            }
+            else {
+                outer = outer->next;
+            }
+        }
+
+        current = current->next;
+    }
+}
+
+
+// Функция для создания нового списка из цифр исходного списка, упорядоченного по возрастанию
+Node* sort_list(Node* head) {
+    if (!head) return NULL;
+
+    Node* new_head = new Node(head->val);
+    Node* cur = head->next;
+
+    while (cur) {
+        Node* new_cur = new_head;
+        Node* prev = NULL;
+
+        while (new_cur) {
+            if (new_cur->val == cur->val) {
+                break;
+            }
+            else if (new_cur->val > cur->val) {
+                Node* temp = new Node(cur->val);
+                temp->next = new_cur;
+                if (prev) {
+                    prev->next = temp;
+                }
+                else {
+                    new_head = temp;
+                }
+                break;
+            }
+            else if (!new_cur->next) {
+                Node* temp = new Node(cur->val);
+                new_cur->next = temp;
+                break;
+            }
+            else {
+                prev = new_cur;
+                new_cur = new_cur->next;
+            }
+        }
+
+        cur = cur->next;
+    }
+
+    return new_head;
+}
+
+// Функция для вывода списка на экран
+void print_list(Node* head) {
+    Node* cur = head;
+    while (cur) {
+        cout << cur->val << " ";
+        cur = cur->next;
+    }
+    cout << endl;
+}
+
+int main() {
+
+    int i;
+
+    Node* head = new Node('1');
+    head->next = new Node('2');
+    head->next->next = new Node('3');
+    head->next->next->next = new Node('5');
+    head->next->next->next->next = new Node('5');
+    head->next->next->next->next->next = new Node('5');
+    head->next->next->next->next->next->next = new Node('4');
+    head->next->next->next->next->next->next->next = new Node('4');
+    head->next->next->next->next->next->next->next->next = new Node('8');
+    head->next->next->next->next->next->next->next->next->next = new Node('9');
+
+    
+a1:   cout << "Initial list: ";
+    print_list(head);
+    cout << "\n";
+    cout << "Choose an option:" << "\n";
+    cout << "1. Determine the longest sequence" << "\n";
+    cout << "2. Removing duplicate characters in a sequence" << "\n";
+    cout << "3. Creating a list whose characters are ordered in ascending order" << "\n";
+    cout << "4. Exit" << "\n";
+    cout << "\n";
+    cin >> i;
+
+    while (i != 4) {
+        if (i == 1) {
+            cout << "\n";
+            longest_sequence(head);
+            cout << "\n";
+            cout << "\n";
+            goto a1;
+        }
+
+        if (i == 2) {
+            cout << "\n";
+            removeDuplicates(head);
+            cout << "List after removing duplicates: ";
+            print_list(head);
+            cout << "\n";
+            cout << "\n";
+            goto a1;
+        }
+
+        if (i == 3) {
+            cout << "\n";
+            Node* sorted_list = sort_list(head);
+            cout << "Sorted list: ";
+            print_list(sorted_list);
+            cout << "\n";
+            cout << "\n";
+            goto a1;
+        }
+
+        if (i == 4) {
+            return 0;
+        }
+    }
+}
